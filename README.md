@@ -24,6 +24,11 @@ SCHEDULE:
 Schedule (through 6/16/2022)
 1. Get the Data (COMPLETE sort of.)
 2. Clean & Explore the Data (6/2/2022)
+  2.a. Figure out how to Import the floorplan with a CRS -- Done I think.
+  2.b. Pivot data for site locations
+  2.c. Do some EDA for trending data. Add annotations for limits
+  2.d. Add buttons to sampling sites to take you to trending data for site
+  2.e. ???
 3. Create Presentation (6/7/2022)
 4. Internal Demos (6/11/2022)
 5. Demo Day (6/16/2022)

@@ -1,0 +1,44 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyr)
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(raster)
+library(png)
+library(mapview)
+library(leaflet)
+library(terra)
+library(rgdal)
+```
+
+```{r}
+micro<-read_excel('./data/eMIC Notebook - Berg.xlsx')
+```
+
+```{r}
+png <- readPNG('./images/Bulk Manufacturing Area.png')
+
+rst_blue <- raster(png[, , 1])
+rst_green <- raster(png[, , 2])
+rst_red <- raster(png[, , 3])
+
+img <- brick(rst_red, rst_green, rst_blue)
+
+m <- viewRGB(img, maxpixels =  950716)
+
+m
+```
+
+
+```{r}
+b<- rast('./images/Bulk Manufacturing Area.png')
+plotRGB(b, maxcell =  950716)
+
+```
+
+

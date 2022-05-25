@@ -9,18 +9,21 @@
 
 library(shiny)
 
+
 # Define server logic required to draw a histogram
-shinyServer(function(input, output) {
-
-    output$distPlot <- renderPlot({
-
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white')
-
-    })
-
+shinyServer(function(input, output, session) {
+  
+  rst_blue <- raster(png[, , 1])
+  rst_green <- raster(png[, , 2])
+  rst_red <- raster(png[, , 3])
+  
+  img <- brick(rst_red, rst_green, rst_blue)
+  
+  m <- viewRGB(img)
+  
+  output$mymap <- renderLeaflet({
+    leaflet() %>%
+      addMarkers(lng = ohs$x, lat = ohs$y)
+  })
 })
+
