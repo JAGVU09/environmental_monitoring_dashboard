@@ -1,0 +1,35 @@
+---
+title: "Floorplan"
+author: "James Gilbert"
+date: "5/26/2022"
+output: html_document
+---
+
+```{r}
+library(raster)
+library(png)
+library(mapview)
+library(leaflet)
+library(terra)
+library(rgdal)
+```
+
+```{r}
+png <- readPNG('./images/Bulk Manufacturing Area.png')
+
+rst_blue <- raster(png[, , 1])
+rst_green <- raster(png[, , 2])
+rst_red <- raster(png[, , 3])
+
+img <- brick(rst_red, rst_green, rst_blue)
+
+m <- viewRGB(img, maxpixels =  950716)
+
+m
+```
+
+```{r}
+b<- rast('./images/Bulk Manufacturing Area.png')
+plotRGB(b, maxcell =  950716)
+```
+

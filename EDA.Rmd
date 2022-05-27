@@ -8,37 +8,31 @@ library(tidyr)
 library(readxl)
 library(dplyr)
 library(ggplot2)
-library(raster)
-library(png)
-library(mapview)
-library(leaflet)
-library(terra)
-library(rgdal)
+library(tidyverse)
 ```
 
 ```{r}
-micro<-read_excel('./data/eMIC Notebook - Berg.xlsx')
+micro<-read_excel('./data/eMIC Notebook - Berg.xlsx') %>% 
+  fill(`MID Number`, .direction = "down") %>% 
+  pivot_longer(cols = starts_with('Site Location'), values_drop_na = TRUE) %>% 
+  dplyr::select(`Performance Date`, `MID Number`, `Colony Morphology`, value) %>% 
+  rename(date = `Performance Date`, ID = `MID Number`, sample_site = value) 
+
+micro
 ```
-
 ```{r}
-png <- readPNG('./images/Bulk Manufacturing Area.png')
-
-rst_blue <- raster(png[, , 1])
-rst_green <- raster(png[, , 2])
-rst_red <- raster(png[, , 3])
-
-img <- brick(rst_red, rst_green, rst_blue)
-
-m <- viewRGB(img, maxpixels =  950716)
-
-m
+micro %>% count(ID) %>% group_by(sample_site)
 ```
 
 
 ```{r}
-b<- rast('./images/Bulk Manufacturing Area.png')
-plotRGB(b, maxcell =  950716)
-
+micro %>% count(ID, sample_site) %>% 
+  arrange(desc(n))
 ```
 
+
+```{r}
+micro %>% count(sample_site, ID) %>% 
+  arrange(desc(n))
+```
 

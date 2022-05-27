@@ -40,3 +40,17 @@ ISSUES:
 The new facility is currently under construction so existing monitoring data does not exist. So this will be a snapshot for an old facility but it should be a simple task to import the new site maps and recode the locations.
 The data itself is not particularly large but it is dirty. It contains many strings that describe bacteria/fungal colonies, +/- for growth, raw counts, NAs. It will need a lot of cleaning for it to be usable. Part of my goal with this project is to automate this process so it’s more standardized. Data integrity is part of the requirements of the FDA regulations.
 There’s also a lot of technical jargon I’ll have to explain when presenting this. I’ll need to simplify it for a non-technical audience and force myself to not use technical language during the presentation.
+
+5/24/2022
+Goal: Get the floorplan into something that has a CRS.
+Result: Was able to import the png and add to a map with CRS. if you zoom out you see Africa. I'll need to set a max and min zoom level and annotate to get the site locations as buttons some how.
+
+5/26/2022
+Goal: Perform some EDA. I need to at least get some pivot tables working for the data to be usable.
+MID number needs to be pivoted and counted and grouped with the site locations.
+
+Results: Noticed an error on import where a merged cell across two rows resulted in NAs in the MID Number column. Solved.
+
+Pivoted longer: Used pivot_longer(cols = starts_with('Site Location'), values_drop_na = TRUE) and got the output I was looking for. Dropped the unnecessary columns and renamed them.
+
+I'll need to figure out how to group by the sample site and date, and count the number of ID's this way to make the graphs I want to show up when clicking on a sample site. 
