@@ -23,9 +23,13 @@ rst_red <- raster(png[, , 3])
 
 img <- brick(rst_red, rst_green, rst_blue)
 
+floorplan <- leaflet(options = leafletOptions(minZoom = 9, maxZoom = 12))
 m <- viewRGB(img, maxpixels =  950716)
+  
 
-m
+
+
+floorplan
 ```
 
 ```{r}
@@ -45,5 +49,41 @@ img <- brick(rst_red, rst_green, rst_blue)
 m <- viewRGB(img, maxpixels =  1117363)
 
 m
+```
+
+
+```{r}
+
+png <- readPNG('./images/Bulk Manufacturing Area.png')
+
+rst_blue <- raster(png[, , 1])
+rst_green <- raster(png[, , 2])
+rst_red <- raster(png[, , 3])
+
+img <- brick(rst_red, rst_green, rst_blue)
+pal <- colorNumeric(c("#0C2C84", "#41B6C4", "#FFFFCC"), values(img),
+  na.color = "transparent")
+
+leaflet() %>% addTiles() %>%
+  addRasterImage(img, colors = pal, opacity = 0.8) %>%
+  addLegend(pal = pal, values = values(img),
+    title = "Surface temp")
+```
+
+
+
+
+
+```{r}
+png <- readPNG('./images/Bulk Manufacturing Area.png')
+
+#png<- raster(png)
+
+#img <- brick(rst_red, rst_green, rst_blue)
+#pal <- colorNumeric(c("#0C2C84", "#41B6C4", "#FFFFCC"), values(png),
+  #na.color = "transparent")
+
+leaflet() %>% addTiles() %>%
+  addRasterImage(png, colors = pal, opacity = 0.8) 
 ```
 

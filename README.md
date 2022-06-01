@@ -53,4 +53,18 @@ Results: Noticed an error on import where a merged cell across two rows resulted
 
 Pivoted longer: Used pivot_longer(cols = starts_with('Site Location'), values_drop_na = TRUE) and got the output I was looking for. Dropped the unnecessary columns and renamed them.
 
-I'll need to figure out how to group by the sample site and date, and count the number of ID's this way to make the graphs I want to show up when clicking on a sample site. 
+I'll need to figure out how to group by the sample site and date, and count the number of ID's this way to make the graphs I want to show up when clicking on a sample site.
+
+5/28/2022
+Working on grouping and counting the microbes by sample site. I don't think I'm getting the aggregation to work properly. Counts are kind of low.
+
+I have data for Viable microbial, but don't have non-viable. it may be worth generating data for illustrative purposes. Veronica recommends holding off on this.
+
+5/31/2022
+Noticed that there was also a problem with my date column having NAs, which was a result of the import. fixed in a similar way to how I fixed the issue with NAs in the MID Number column. Inspected other columns that this also was an issue and I think the only other one is Colony morphology which is now fixed.
+
+Tonight I'll be working on a similar group by to what I did last time but adding in a the date. I'll have to add another column to convert the dates to Qs for quarterly reports and then group the ID column with the Quarters columns. 
+
+Id like to also do some work on my map. I think I can quickly figure out how to add a min and max zoom level for my floorplans. Also try to figure out how to get a higher quality version of the floorplan.
+
+Would also be worth spending some time getting a list of all of the sites since that will probably be a tedious

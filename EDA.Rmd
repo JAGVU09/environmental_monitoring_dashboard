@@ -9,40 +9,26 @@ library(readxl)
 library(dplyr)
 library(ggplot2)
 library(tidyverse)
+library(lubridate)
 ```
 
 ```{r}
 micro<-read_excel('./data/eMIC Notebook - Berg.xlsx') %>% 
   fill(`MID Number`, .direction = "down") %>% 
+  fill(`Colony Morphology`, .direction = "down") %>% 
+  fill(`Performance Date`, .direction = "down") %>% 
   pivot_longer(cols = starts_with('Site Location'), values_drop_na = TRUE) %>% 
   dplyr::select(`Performance Date`, `MID Number`, `Colony Morphology`, value) %>% 
-  rename(date = `Performance Date`, ID = `MID Number`, sample_site = value) 
-
-micro
+  rename(date = `Performance Date`, ID = `MID Number`, sample_site = value) %>% 
+  mutate(date = parse_date_time(`date`,orders = 'd%B%Y%')) %>% 
+  mutate(Q = quarter(`date`, with_year = TRUE))
 ```
 
-
-
-```{r}
-micro %>% filter(sample_site == '301-3: Air 3')
-```
-
-```{r}
-micro %>% 
-  filter(sample_site == '301-3: Air 3') %>% 
-  group_by(sample_site) %>% 
-  summarise(tot_ids = n_distinct(ID))
-```
 add another summarise with a tally to count every row.
 tally and count won't work on ID column for some reason.
 n() works and gives the correct number. There are 271 rows for sample site == '301-3: Air 3' but n_distinct returns 270. Some IDs could be found at the same site multiple times so 271 would be a more accurate count. 
 
-```{r}
-micro %>% 
-  filter(sample_site == '301-3: Air 3') %>% 
-  group_by(sample_site) %>% 
-  summarise(n = n())
-```
+
 ```{r}
 micro %>% 
   group_by(sample_site) %>% 
@@ -50,12 +36,20 @@ micro %>%
   ungroup() %>% 
   arrange(desc(tot_ids))
 ```
+```{r}
+micro %>% 
+  group_by(sample_site, Q) %>% 
+  summarise(tot_ids = n()) %>% 
+  ungroup() %>% 
+  arrange(desc(tot_ids))
+```
 
-Count ID grouped by site and add in Time component with date column. May have to down fill because there are a lot of NAs.
+
+Count ID grouped by site and add in Time component with date column. 
+May have to down fill because there are a lot of NAs.
+* The same thing that happened with the MID Number has happened with the dates. It's not that there are NAs it's the way tidy imported the excel with merged cells. 
 
 There are sites that are not included in the map I have. These sites fall in the upper left hand corner of the map I have, which is the asceptic fill suite. I have a map for the asceptic fill suite. I need to figure out how to combine these two maps together so I can use that as my background or make a separate tab on my dashboard for the asceptic fill suite. ** I think the second option would be easier**
-
-
 
 Also get out the TM/SOP for this EM monitoring and familiarize yourself with the purposes of each room and possibly think of a rationale for why some rooms have much higher counts than other rooms. 
 
