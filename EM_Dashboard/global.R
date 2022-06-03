@@ -13,5 +13,5 @@ rst_red <- raster(png[, , 3])
 
 img <- brick(rst_red, rst_green, rst_blue)
 
-m <- viewRGB(img, maxpixels =  950716)
+m <- viewRGB(img, maxpixels =  950716)c
 

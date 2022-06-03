@@ -63,7 +63,7 @@ I have data for Viable microbial, but don't have non-viable. it may be worth gen
 5/31/2022
 Noticed that there was also a problem with my date column having NAs, which was a result of the import. fixed in a similar way to how I fixed the issue with NAs in the MID Number column. Inspected other columns that this also was an issue and I think the only other one is Colony morphology which is now fixed.
 
-Tonight I'll be working on a similar group by to what I did last time but adding in a the date. I'll have to add another column to convert the dates to Qs for quarterly reports and then group the ID column with the Quarters columns. 
+Tonight I'll be working on a similar group by to what I did last time but adding in a the date. I'll have to add another column to convert the dates to Qs for quarterly reports and then group the ID column with the Quarters columns. **DONE**
 
 Id like to also do some work on my map. I think I can quickly figure out how to add a min and max zoom level for my floorplans. Also try to figure out how to get a higher quality version of the floorplan.
 
