@@ -68,3 +68,13 @@ Tonight I'll be working on a similar group by to what I did last time but adding
 Id like to also do some work on my map. I think I can quickly figure out how to add a min and max zoom level for my floorplans. Also try to figure out how to get a higher quality version of the floorplan.
 
 Would also be worth spending some time getting a list of all of the sites since that will probably be a tedious
+
+06/02/2022
+Make a shiny app with a map. **DONE**
+Add one of my floorplans to the map. **DONE**
+Add reactivity so I can switch between floorplans. **Not finished**
+
+6/04/2022
+Add reactivity so I can switch between floorplans.**DONE**
+Begin adding the ability to click on sites.
+added EDA components to global.R **DONE**
