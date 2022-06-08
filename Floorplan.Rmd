@@ -27,6 +27,19 @@ m <- viewRGB(img, maxpixels =  950716)
 
 m
 ```
+terra has a click function to interact with a map. This is probably what I'll need to use. 
+```{r}
+#trying to convert to terra since rdgal will be deprecated next year.
+png <- readPNG('./images/Bulk Manufacturing Area.png')
+
+img <- brick(png)
+
+m <- viewRGB(img, 1, 2, 3, maxpixels =  950716)
+
+m
+```
+
+
 
 
 ```{r}
