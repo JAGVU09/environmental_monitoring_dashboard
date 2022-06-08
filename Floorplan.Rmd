@@ -60,4 +60,11 @@ aseptic_surf_m <- viewRGB(aseptic_surf_img, maxpixels = 1041654)
 
 aseptic_surf_m
 ```
+```{r}
+p<-readPNG('./images/Asceptic Fill Suite Air.png')
+r<- rast(p)
+v<- viewRGB(r)
+v
+
+```
 

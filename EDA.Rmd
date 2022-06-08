@@ -10,7 +10,9 @@ library(dplyr)
 library(ggplot2)
 library(tidyverse)
 library(lubridate)
+library(stringr)
 ```
+
 
 ```{r}
 micro<-read_excel('./data/eMIC Notebook - Berg.xlsx') %>% 
@@ -23,13 +25,37 @@ micro<-read_excel('./data/eMIC Notebook - Berg.xlsx') %>%
   mutate(date = parse_date_time(`date`,orders = 'd%B%Y%')) %>% 
   mutate(Q = quarter(`date`, with_year = TRUE))
 ```
+Possible variation on a sample site name (Human Data Entry Error)
+311-5: Air 5
+311:5: Air 5
+311-5:Air 5
+311-5 
+311-5 Air 5
+311-5:Air5
+311: 5Air 5
+311-5 :Air 5
+311-5Air 5
+311-5: air 5
+311-5Air5
+Construct a Regex that matches all of these and a match that converts to 311-5
+
 ```{r}
+micro$sample_site<-micro$sample_site %>% str_replace('\\d+[:|-]\\s?\\d+:?\\s?:?[A-Za-z]+\\s?\\d+', '\\d+-\\d+') %>% str_replace('-\\s+', '-') 
+```
+
+```{r}
+micro
+```
+
+```{r}
+#Count ID grouped by site and add in Time component with date column.
 micro %>% 
   group_by(sample_site) %>% 
   summarise(tot_ids = n()) %>% 
   ungroup() %>% 
   arrange(desc(tot_ids))
 ```
+
 ```{r}
 micro %>% 
   group_by(sample_site, Q) %>% 
@@ -37,23 +63,14 @@ micro %>%
   ungroup() %>% 
   arrange(desc(tot_ids))
 ```
-
 ```{r}
-micro$sample_site %>% unique()
+micro$sample_site %>% str_replace('\\d+[:|-]\\s?\\d+:?\\s?:?[A-Za-z]+\\s?\\d+', '\\d+-\\d+') %>% str_replace('-\\s+', '-') %>% n_distinct()
+```
+```{r}
+micro$date %>% is.na()
+
 ```
 
-Count ID grouped by site and add in Time component with date column. 
-May have to down fill because there are a lot of NAs.
-* The same thing that happened with the MID Number has happened with the dates. It's not that there are NAs it's the way tidy imported the excel with merged cells. 
-
-There are sites that are not included in the map I have. These sites fall in the upper left hand corner of the map I have, which is the asceptic fill suite. I have a map for the asceptic fill suite. I need to figure out how to combine these two maps together so I can use that as my background or make a separate tab on my dashboard for the asceptic fill suite. ** I think the second option would be easier**.
-Additionally, some of the sites are people. We can exclude those for this app, but would be useful to add in later. 
-
-Also get out the TM/SOP for this EM monitoring and familiarize yourself with the purposes of each room and possibly think of a rationale for why some rooms have much higher counts than other rooms. 
-
-```{r}
-
-```
 
 
 

@@ -55,6 +55,11 @@ micro<-read_excel('./data/eMIC Notebook - Berg.xlsx') %>%
   mutate(date = parse_date_time(`date`,orders = 'd%B%Y%')) %>% 
   mutate(Q = quarter(`date`, with_year = TRUE))
 
+#REGEX to clean up the sample sites
+micro$sample_site<-micro$sample_site %>%
+  str_replace('\\d+[:|-]\\s?\\d+:?\\s?:?[A-Za-z]+\\s?\\d+', '\\d+-\\d+') %>%
+  str_replace('-\\s+', '-')
+
 #I think these actually need to go on the server side. 
 site_total_count<-micro %>% 
   group_by(sample_site) %>% 
