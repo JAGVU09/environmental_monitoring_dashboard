@@ -11,23 +11,15 @@ library(png)
 library(mapview)
 library(leaflet)
 library(terra)
-library(rgdal)
+library(sp)
+library(leafem)
+library(leafpop)
 ```
 
-```{r}
-png <- readPNG('./images/Bulk Manufacturing Area.png')
 
-rst_blue <- raster(png[, , 1])
-rst_green <- raster(png[, , 2])
-rst_red <- raster(png[, , 3])
+terra has a click function to interact with a map. This is probably what I'll need to use.
 
-img <- brick(rst_red, rst_green, rst_blue)
-
-m <- viewRGB(img, maxpixels =  950716)
-
-m
-```
-terra has a click function to interact with a map. This is probably what I'll need to use. 
+There's also addCircles and addRectangles from leaflet.
 ```{r}
 #trying to convert to terra since rdgal will be deprecated next year.
 png <- readPNG('./images/Bulk Manufacturing Area.png')
@@ -36,10 +28,48 @@ img <- brick(png)
 
 m <- viewRGB(img, 1, 2, 3, maxpixels =  950716)
 
-m
+m 
 ```
 
 
+
+```{r}
+#to add markers, need to use m@map instead of leaflet(). 
+lng = c(0.17595, 0.26848, 0.57198)
+lat = c(0.34418, 0.34528, 0.48906)
+labels = c('302-1', '302-2', '302-7')
+
+list(graph)
+
+m@map %>% 
+  addTiles(options = tileOptions(minZoom = 10, maxZoom = 11)) %>%
+  addCircles(lng = lng, lat = lat, radius = 1400, color = "#ff0033", weight = 2, label = labels) %>% 
+  addPopupGraphs(list(graph), group = 'room')
+```
+
+
+
+```{r}
+#pol<-rasterToPolygons(img)
+
+m %>% addPolygons()
+
+m
+```
+
+```{r}
+I have 11 different colors I need to make polygons out of. 
+
+ if (img color == R 246, G 251, B 11) {
+      click(img)
+    }
+    else if (img color == '') {
+      aseptic_surf_m@map
+    }
+    else {
+      bulk_m@map
+    }
+```
 
 
 ```{r}
@@ -58,8 +88,6 @@ m
 
 
 
-
-
 ```{r}
 aseptic_surf <- readPNG('./images/Asceptic Fill Suite Surface.png')
 
@@ -72,11 +100,14 @@ aseptic_surf_img <- brick(aseptic_surf_red, aseptic_surf_green, aseptic_surf_blu
 aseptic_surf_m <- viewRGB(aseptic_surf_img, maxpixels = 1041654)
 
 aseptic_surf_m
+
 ```
+
 ```{r}
+maps <- leaflet()
 p<-readPNG('./images/Asceptic Fill Suite Air.png')
 r<- rast(p)
-v<- viewRGB(r)
+v<- addRasterRGB(img, map = maps)
 v
 
 ```

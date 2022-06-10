@@ -13,7 +13,9 @@ shinyServer(function(input, output, session) {
       aseptic_surf_m@map
     }
     else {
-      bulk_m@map
+      bulk_m@map %>%
+        addTiles(options = tileOptions(minZoom = 10, maxZoom = 11)) %>%
+        addCircles(lng = 0.17595, lat = 0.34418, radius = 1400)
     }
   })
 })

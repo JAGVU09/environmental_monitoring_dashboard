@@ -39,9 +39,6 @@ Possible variation on a sample site name (Human Data Entry Error)
 311-5Air5
 Construct a Regex that matches all of these and a match that converts to 311-5
 
-```{r}
-#micro$sample_site<-micro$sample_site %>% str_replace('\\d+[:|-]\\s?\\d+:?\\s?:?[A-Za-z]+\\s?\\d+', '\\d+-\\d+') %>% str_replace('-\\s+', '-') 
-```
 
 ```{r}
 micro$sample_site<-micro$sample_site %>% 
@@ -62,10 +59,21 @@ micro$sample_site[micro$sample_site==""]<-NA
 micro<- micro %>% drop_na()
 ```
 
+```{r}
+micro %>% write_csv('./data/micro.csv')
+```
 
 ```{r}
-micro$sample_site %>% 
-  unique()
+micro2<-read_csv('./data/micro.csv')
+```
+
+
+```{r}
+sample_site<-micro$sample_site %>%
+  unique() %>% 
+  tibble()
+
+sample_site %>% write_excel_csv('./data/sample_sites.csv')
 ```
 
 
@@ -115,12 +123,16 @@ ggplot(quarters, aes(x = Q, y = tot_ids, color = sample_site, )) +
   geom_col(show.legend = FALSE)
 ```
 ```{r}
-quarters
+dates<-micro %>% 
+  group_by(sample_site, date) %>% 
+  summarise(tot_ids = n()) %>% 
+  ungroup() %>% 
+  arrange(desc(tot_ids))
 ```
 
 
 ```{r}
-df <- quarters %>% filter(str_detect(sample_site, "^301"))
+df <- quarters %>% filter(str_detect(sample_site, "^302"))
 ```
 
 ```{r}
@@ -132,5 +144,18 @@ t<-ggplot(df, aes(x = Q, y = tot_ids, color = sample_site)) +
 t + facet_wrap(vars(sample_site))
 ```
 
+
+```{r}
+df <- dates %>% filter(str_detect(sample_site, "302-1"))
+```
+
+```{r}
+t<-ggplot(df, aes(x = date, y = tot_ids, color = sample_site)) +
+  geom_col()
+```
+
+```{r}
+graph<-t + facet_wrap(vars(sample_site))
+```
 Show me sites that are increasing in counts for a particular year. to select for remediation
 
