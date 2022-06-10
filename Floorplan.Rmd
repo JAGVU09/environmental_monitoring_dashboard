@@ -21,33 +21,24 @@ terra has a click function to interact with a map. This is probably what I'll ne
 
 There's also addCircles and addRectangles from leaflet.
 ```{r}
-#trying to convert to terra since rdgal will be deprecated next year.
+#trying to convert to terra since rgdal will be deprecated next year.
 png <- readPNG('./images/Bulk Manufacturing Area.png')
 
 img <- brick(png)
 
 m <- viewRGB(img, 1, 2, 3, maxpixels =  950716)
 
-m 
-```
+lng = c(0.17595, 0.26848, 0.57198, 0.43600)
+lat = c(0.34418, 0.34528, 0.48906, 0.40600)
+labels = c('302-1', '302-2', '302-7', '305-1')
 
-
-
-```{r}
-#to add markers, need to use m@map instead of leaflet(). 
-lng = c(0.17595, 0.26848, 0.57198)
-lat = c(0.34418, 0.34528, 0.48906)
-labels = c('302-1', '302-2', '302-7')
-
-list(graph)
+graphs = list(graph1, graph2, graph3, graph4)
 
 m@map %>% 
-  addTiles(options = tileOptions(minZoom = 10, maxZoom = 11)) %>%
-  addCircles(lng = lng, lat = lat, radius = 1400, color = "#ff0033", weight = 2, label = labels) %>% 
-  addPopupGraphs(list(graph), group = 'room')
+  addTiles() %>%
+  addCircles(lng = lng, lat = lat, radius = 1400, color = "#ff0033", weight = 2, label = labels, group = 'room') %>% 
+  addPopupGraphs(graphs, group = 'room')
 ```
-
-
 
 ```{r}
 #pol<-rasterToPolygons(img)
@@ -73,42 +64,30 @@ I have 11 different colors I need to make polygons out of.
 
 
 ```{r}
-png <- readPNG('./images/Asceptic Fill Suite Air.png')
+aseptic_air_png <- readPNG('./images/Asceptic Fill Suite Air.png')
 
-rst_blue <- raster(png[, , 1])
-rst_green <- raster(png[, , 2])
-rst_red <- raster(png[, , 3])
+aseptic_air_img <- brick(aseptic_air_png)
 
-img <- brick(rst_red, rst_green, rst_blue)
+aseptic_air <- viewRGB(aseptic_air_img, 1, 2, 3, maxpixels =  1117363)
 
-m <- viewRGB(img, maxpixels =  1117363)
-
-m
+aseptic_air@map %>% 
+  addTiles() %>%
+  addCircles(lng = 0.08635, lat = 0.32595, radius = 2000, color = "#ff0033", weight = 2, label = labels, popup = TRUE) %>% 
+  addPopupGraphs(list(graph), group = 'Air sites')
+  
 ```
 
 
 
 ```{r}
-aseptic_surf <- readPNG('./images/Asceptic Fill Suite Surface.png')
+aseptic_surf_png <- readPNG('./images/Asceptic Fill Suite Surface.png')
 
-aseptic_surf_blue <- raster(aseptic_surf[, , 1])
-aseptic_surf_green <- raster(aseptic_surf[, , 2])
-aseptic_surf_red <- raster(aseptic_surf[, , 3])
+aseptic_surf_img <- brick(aseptic_surf_png)
 
-aseptic_surf_img <- brick(aseptic_surf_red, aseptic_surf_green, aseptic_surf_blue)
+aseptic_surf_m <- viewRGB(aseptic_surf_img, 1, 2, 3, maxpixels = 1041654)
 
-aseptic_surf_m <- viewRGB(aseptic_surf_img, maxpixels = 1041654)
-
-aseptic_surf_m
+aseptic_surf_m@map %>% 
+  addTiles() %>%
+  addCircles(lng = 0.08068, lat = 0.08051, radius = 2000, color = "#ff0033")
 
 ```
-
-```{r}
-maps <- leaflet()
-p<-readPNG('./images/Asceptic Fill Suite Air.png')
-r<- rast(p)
-v<- addRasterRGB(img, map = maps)
-v
-
-```
-

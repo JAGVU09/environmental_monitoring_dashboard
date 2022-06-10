@@ -1,0 +1,153 @@
+---
+title: "EDA_2"
+author: "James Gilbert"
+date: '2022-06-10'
+output: html_document
+---
+
+```{r}
+library(tidyr)
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+library(lubridate)
+library(stringr)
+library(ggplot2)
+```
+
+```{r}
+micro<-read_csv('./data/micro_em.csv')
+```
+
+```{r}
+micro$sample_site %>% 
+  unique() %>% 
+  tibble() %>% 
+  write_csv('./data/sample_sites.csv')
+```
+
+```{r}
+micro$sample_site %>% unique()
+```
+
+```{r}
+weeks <-micro %>% 
+  mutate(Week = week(`date`)) %>% 
+  group_by(sample_site, Week) %>% 
+  summarise(tot_ids = n()) %>% 
+  ungroup() %>% 
+  arrange(desc(tot_ids))
+```
+
+```{r}
+
+df <- weeks %>% filter(str_detect(sample_site, "^302"))
+
+t<-ggplot(df, aes(x = Week, y = tot_ids, color = sample_site)) +
+  geom_col()
+
+t + facet_wrap(vars(sample_site))
+```
+
+
+```{r}
+quarters<-micro %>% 
+  group_by(sample_site, Q) %>% 
+  summarise(tot_ids = n()) %>% 
+  ungroup() %>% 
+  arrange(desc(tot_ids))
+```
+
+```{r}
+dates<-micro %>% 
+  group_by(sample_site, date) %>% 
+  summarise(tot_ids = n()) %>% 
+  ungroup() %>% 
+  arrange(desc(tot_ids))
+```
+
+```{r}
+df <- quarters %>% filter(str_detect(sample_site, "^302"))
+
+t<-ggplot(df, aes(x = Q, y = tot_ids, color = sample_site)) +
+  geom_line()
+
+t + facet_wrap(vars(sample_site))
+```
+
+```{r}
+df <- dates %>% filter(str_detect(sample_site, "^302"))
+
+t<-ggplot(df, aes(x = date, y = tot_ids, color = sample_site)) +
+  geom_line()
+
+t + facet_wrap(vars(sample_site))
+```
+
+
+
+```{r}
+df <- dates %>%
+  filter(str_detect(sample_site, '302-1\\b'))
+
+t<-ggplot(df, aes(x = date, y = tot_ids, color = sample_site)) +
+  geom_col(show.legend = FALSE)
+
+graph1<-t + facet_wrap(vars(sample_site))
+
+graph1
+```
+
+```{r}
+df <- dates %>%
+  filter(str_detect(sample_site, '302-2\\b'))
+
+t<-ggplot(df, aes(x = date, y = tot_ids, color = sample_site)) +
+  geom_col(show.legend = FALSE)
+
+graph2<-t + facet_wrap(vars(sample_site))
+
+graph2
+```
+
+```{r}
+df <- dates %>%
+  filter(str_detect(sample_site, '302-7\\b'))
+
+t<-ggplot(df, aes(x = date, y = tot_ids, color = sample_site)) +
+  geom_col(show.legend = FALSE)
+
+graph3<-t + facet_wrap(vars(sample_site))
+
+graph3
+```
+
+```{r}
+df <- dates %>%
+  filter(str_detect(sample_site, '302-1\\b'))
+
+t<-ggplot(df, aes(x = date, y = tot_ids, color = sample_site)) +
+  geom_line(show.legend = FALSE)
+
+graph<-t + facet_wrap(vars(sample_site))
+
+graph
+```
+
+```{r}
+df_week <- weeks %>%
+  filter(str_detect(sample_site, '305-1\\b'))
+
+t_week<-ggplot(df_week, aes(x = Week, y = tot_ids)) +
+  geom_line()
+ 
+t_week + geom_hline(yintercept = c(100, 75), linetype = c('solid','dashed'), color = c('red', 'orange'))
+
+```
+
+
+```{r}
+arima(dates$tot_ids)
+```
+
