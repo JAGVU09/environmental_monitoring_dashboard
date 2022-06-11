@@ -20,9 +20,7 @@ shinyUI(fluidPage(
   mainPanel(
     tabsetPanel(
       type = 'tabs',
-      tabPanel('Map', leafletOutput("mymap"),
-               p()),
-      tabPanel('Column', plotOutput("column", height = "600px"))
+      tabPanel('Map', leafletOutput("mymap"))
     )
   ))
 ))
