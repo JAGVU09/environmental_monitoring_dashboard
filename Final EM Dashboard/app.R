@@ -12,6 +12,8 @@ library(lubridate)
 library(leafem)
 library(leafpop)
 library(shiny)
+library(tseries)
+library(forecast)
 library(shinythemes)
 #Read in the data
 micro <- read_csv('./micro_em.csv') %>%
@@ -113,7 +115,8 @@ ui <- navbarPage(
                                     Results are total counts grouped by Weeks.',
       p(),
       'Click on Forecasting to see predictions
-                                    based on historical data for each site'
+                                    based on historical data for each site. 
+      Use this data to make informed decisions on disinfectants and cleaning routines.'
     )
   ),
   tabPanel('Facility Maps',
@@ -134,7 +137,7 @@ ui <- navbarPage(
                mainPanel(leafletOutput("map"),
                          p(),
                          plotOutput("myPlot"),
-                         p(),)
+                         p(), )
              )
            )),
   tabPanel('Forecasting',
@@ -160,7 +163,7 @@ server <- shinyServer(function(input, output) {
         addTiles(options = tileOptions(minZoom = 10 , maxZoom = 13))
     }
     else {
-      bulk_m@map %>%
+      bulk_m@map %>% #addRasterRGB(x = bulk_img, map=bulk_m@map) %>% 
         addTiles(options = tileOptions(minZoom = 10 , maxZoom = 13)) %>%
         addCircleMarkers(lat = bulk_Data$lat,
                          lng = bulk_Data$lng,
@@ -194,11 +197,17 @@ server <- shinyServer(function(input, output) {
                  label = 'Action Level')
     })
     output$arima <- renderPlot({
+     #browser()
       micro %>%
         filter(str_detect(sample_site, paste0(data$clickedMarker$id[[1]], '\\b'))) %>%
-        select(tot_ids) %>% ts(frequency = 52)  %>%
-        auto.arima(lambda = 'auto') %>% forecast(h = 10) %>%
-        plot(xlab = 'Weeks', ylab = 'CFU', main = paste0(data$clickedMarker$id[[1]], '\b'))
+        dplyr::select(tot_ids) %>% ts(frequency = 52) %>%
+        auto.arima(lambda = 'auto') %>% 
+        forecast(h = 10)  %>%
+        plot(
+          xlab = 'Weeks',
+          ylab = 'CFU',
+          main = paste0(data$clickedMarker$id[[1]])
+          )
     })
   })
 })
