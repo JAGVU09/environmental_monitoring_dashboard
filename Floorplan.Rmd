@@ -1,0 +1,165 @@
+---
+title: "Floorplan"
+author: "James Gilbert"
+date: "5/26/2022"
+output: html_document
+---
+
+```{r}
+library(raster)
+library(png)
+library(mapview)
+library(leaflet)
+library(terra)
+library(sp)
+library(leafem)
+library(leafpop)
+library(plainview)
+```
+
+
+terra has a click function to interact with a map. This is probably what I'll need to use.
+
+There's also addCircles and addRectangles from leaflet.
+```{r}
+#trying to convert to terra since rgdal will be deprecated next year.
+png <- readPNG('./images/Bulk Manufacturing Area.png')
+
+img <- brick(png)
+
+m <- viewRGB(img, 1, 2, 3, maxpixels =  950716)
+
+bulk_lng = c(0.86277,
+        0.90466,
+        0.93624,
+        0.17595,
+        0.26848,
+        0.35465,
+        0.57198,
+        0.65472,
+        0.73505,
+        0.436,
+        0.54829,
+        0.62038,
+        0.46795,
+        0.25354,
+        0.31878,
+        0.10265)
+bulk_lat = c(0.58364,
+        0.58364,
+        0.58398,
+        0.34418,
+        0.34528,
+        0.34268,
+        0.48906,
+        0.59668,
+        0.59668,
+        0.406,
+        0.14076,
+        0.14076,
+        0.28204,
+        0.25612,
+        0.2768,
+        0.2302)
+bulk_labels = c("301-1",
+           "301-2",
+           "301-3",
+           "302-1",
+           "302-2",
+           "302-3",
+           "302-7",
+           "304-2",
+           "304-3",
+           "305-1",
+           "311-6",
+           "311-7",
+           "312-2",
+           "314-2",
+           "314-3",
+           "315-3")
+```
+
+
+
+```{r}
+#map<-leaflet(options = leafletOptions(minZoom = 10, maxZoom = 13))
+
+m@map %>%
+  addTiles(width=400, height=500) %>% 
+  addCircles(lng = bulk_lng, lat = bulk_lat, radius = 1400)
+
+```
+
+```{r}
+m
+```
+
+```{r}
+
+#trying to convert to terra since rgdal will be deprecated next year.
+png <- readPNG('./images/Bulk Manufacturing Area.png')
+
+img <- brick(png)
+
+m <- viewRGB(img, 1, 2, 3, maxpixels =  950716)
+
+lng = c(0.17595, 0.26848, 0.57198, 0.43600)
+lat = c(0.34418, 0.34528, 0.48906, 0.40600)
+labels = c('302-1', '302-2', '302-7', '305-1')
+
+graphs = list(graph1, graph2, graph3, graph4)
+
+m@map %>% 
+  addTiles() %>%
+  addCircles(lng = lng, lat = lat, radius = 1400, color = "#ff0033", weight = 2, label = labels, group = 'room', popup = popupGraph(graphs, width = 400, height = 300))
+```
+
+
+
+
+
+```{r}
+aseptic_air_png <- readPNG('./images/Asceptic Fill Suite Air.png')
+
+aseptic_air_img <- brick(aseptic_air_png)
+
+aseptic_air <- viewRGB(aseptic_air_img, 1, 2, 3, maxpixels =  1117363)
+
+aseptic_air@map %>% 
+  addTiles() %>%
+  addCircles(lng = 0.08635, lat = 0.32595, radius = 2000, color = "#ff0033", weight = 2, label = labels, popup = TRUE) %>% 
+  addPopupGraphs(list(graph), group = 'Air sites')
+  
+```
+
+
+
+```{r}
+aseptic_surf_png <- readPNG('./images/Asceptic Fill Suite Surface.png')
+
+aseptic_surf_img <- brick(aseptic_surf_png)
+
+aseptic_surf_m <- viewRGB(aseptic_surf_img, 1, 2, 3, maxpixels = 1041654)
+
+aseptic_surf_m@map %>% 
+  addTiles() %>%
+  addCircles(lng = 0.08068, lat = 0.08051, radius = 2000, color = "#ff0033")
+
+```
+
+0.58364
+0.58364
+0.58398
+0.34418
+0.34528
+0.34268
+0.48906
+0.59668
+0.59668
+0.406
+0.14076
+0.14076
+0.28204
+0.25612
+0.2768
+0.2302

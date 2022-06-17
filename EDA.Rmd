@@ -1,0 +1,111 @@
+---
+title: "EDA_2"
+author: "James Gilbert"
+date: '2022-06-10'
+output: html_document
+---
+
+```{r}
+library(tidyr)
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+library(lubridate)
+library(stringr)
+library(ggplot2)
+library(forecast)
+#library(DMwR2)
+```
+
+```{r}
+micro<-read_csv('./data/micro_em.csv')
+```
+
+
+```{r}
+df <- weeks %>% filter(str_detect(sample_site, "^302"))
+
+t<-ggplot(df, aes(x = Week, y = tot_ids, color = sample_site)) +
+  geom_line()
+
+t + facet_wrap(vars(sample_site))
+```
+```{r}
+weeks %>% filter(str_detect(sample_site, "^304")) %>% 
+  ggplot(aes(x = Week, y = tot_ids, color = sample_site)) +
+  geom_line()+
+  facet_wrap(vars(sample_site))
+```
+
+
+
+```{r}
+dates<-micro %>% 
+  group_by(sample_site, date) %>% 
+  summarise(tot_ids = n()) %>% 
+  ungroup() %>% 
+  arrange(desc(tot_ids))
+```
+
+```{r}
+weeks<-micro %>% 
+  mutate(Week = week(date)) %>% 
+  group_by(sample_site, Week) %>% 
+  summarise(tot_ids = n()) %>% 
+  ungroup() %>% 
+  arrange(desc(tot_ids))
+```
+
+
+```{r}
+weeks %>%
+  filter(str_detect(sample_site, '304-2')) %>% 
+  ggplot(aes(x = Week, y = tot_ids)) +
+  geom_line()+
+  geom_hline(yintercept = c(75, 50), linetype = c('solid','dashed'), color = c('red', 'orange'))
+```
+
+
+```{r}
+arima(weeks$tot_ids)
+```
+
+```{r}
+weeks %>% filter(str_detect(sample_site,'304-2\\b')) %>% 
+  ggplot(aes(x = Week, y = tot_ids))+
+  geom_point()
+```
+
+```{r}
+room<- weeks%>% filter(str_detect(sample_site,'304-2\\b'))
+train_series <- room$tot_ids[0:29]
+test_series <- room$tot_ids[30:52]
+
+
+arimaModel_1<-arima(train_series, order=c(0,1,2))
+arimaModel_2<-arima(train_series, order=c(1,1,0))
+arimaModel_3<-arima(train_series, order=c(1,1,2))
+
+print(arimaModel_1);print(arimaModel_2);print(arimaModel_3)
+
+
+```
+
+```{r}
+forecast1=predict(arimaModel_1, 10)
+forecast2=predict(arimaModel_2, 10)
+forecast3=predict(arimaModel_3, 10)
+
+accmeasures1=regr.eval(test_series, forecast1$pred)
+accmeasures2=regr.eval(test_series, forecast2$pred)
+accmeasures3=regr.eval(test_series, forecast3$pred)
+accMeasure=rbind(accmeasures1,accmeasures2,accmeasures1)
+print(accMeasure)
+```
+
+```{r}
+AutoArimaModel=auto.arima(train_series)
+AutoArimaModel
+```
+

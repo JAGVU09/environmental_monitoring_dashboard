@@ -1,0 +1,167 @@
+```{r}
+library(tidyr)
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+library(lubridate)
+library(stringr)
+library(ggplot2)
+library(forecast)
+library(tseries)
+#library(bayesforecast)
+```
+
+
+
+```{r}
+micro<-read_csv('./data/micro_em.csv')
+
+weeks<-micro%>%
+  mutate(Week = week(date)) %>% 
+  group_by(sample_site, Week) %>%
+  summarise(tot_ids = n()) %>%
+  ungroup() %>%
+  arrange((Week))
+
+sample_date <-micro %>% 
+  group_by(sample_site, date) %>% 
+  summarise(tot_ids = n()) %>% 
+  ungroup() %>% 
+  arrange((date))
+```
+
+
+```{r}
+rate<-weeks %>%
+        filter(str_detect(
+          sample_site, '301-2'
+        )) %>% select(tot_ids) %>% ts()
+fit_ARIMA <-auto.arima(rate, seasonal = TRUE, lambda = 'auto')
+print(summary(fit_ARIMA))
+checkresiduals(fit_ARIMA)
+
+fcast<-forecast(fit_ARIMA)
+autoplot
+plot(fcast)
+print(summary(fcast))
+```
+
+
+```{r}
+total<-micro%>%
+  mutate(Week = week(date)) %>% 
+  group_by(Week) %>%
+  summarise(tot_ids = n()) %>%
+  ungroup() %>%
+  arrange((Week))
+
+ total %>%
+   ggplot(aes(x=Week, y = tot_ids))+
+   geom_line()
+```
+
+
+```{r}
+weeks %>%
+  filter(str_detect(
+    sample_site, '305-2\\b'
+        )) %>% select(tot_ids) %>% ts()  %>%
+  auto.arima(lambda = 'auto') %>% forecast(h = 10) %>% plot(xlab = 'Weeks', ylab = 'CFU')
+```
+
+```{r}
+sample_date %>%
+  filter(str_detect(
+    sample_site, '301-3\\b'
+        )) %>% select(tot_ids) %>% ts()  %>%
+  auto.arima(lambda = 'auto') %>% forecast(h = 10) %>% plot(xlab = 'sample_date', ylab = 'CFU')
+```
+
+```{r}
+micro %>% group_by(sample_site) %>% select(sample_site) %>%  unique() %>% tally()
+```
+
+
+```{r}
+sample_date %>% 
+  ggplot(aes(x=date, y=tot_ids))+ geom_line()
+weeks%>% 
+  ggplot(aes(x = Week, y = tot_ids))+
+  geom_line()
+month %>% 
+  ggplot(aes(x = month, y = tot_ids))+
+  geom_line()
+ # geom_hline(yintercept = c(75, 50),
+  #           linetype = c('solid', 'dashed'),
+  #           color = c('red', 'orange')) +
+ # labs(x = "Week", y = "CFU")
+
+
+#micro  %>%
+#  ggplot(aes(x = Week, y = tot_ids))+
+#  geom_col()+
+#  geom_hline(yintercept = c(75, 50),
+#             linetype = c('solid', 'dashed'),
+#             color = c('red', 'orange')) +
+#  labs(x = "Week", y = "CFU")
+```
+
+```{r}
+room<-micro %>% filter(str_detect(sample_site, '305-6\\b'))
+#This function actually searches for a range of p, q values, after fixing d by Kwiatkowski-Phillips-Schmidt-Shin (KPSS) test. It chooses the model having lowest AIC score.
+forecast(auto.arima(sample_date$tot_ids), 100)
+forecast(auto.arima(month$tot_ids))
+forecast(auto.arima(weeks$tot_ids))
+```
+
+
+```{r}
+plot(forecast(sample_date$tot_ids, lambda = 'auto'))
+
+plot(forecast(weeks$tot_ids, lambda = 'auto'))
+```
+```{r}
+plot(forecast(sample_date$tot_ids, lambda = 'auto', h =100))
+plot(forecast(weeks$tot_ids, lambda = 'auto', h = 26))
+```
+```{r}
+autoplot(month$tot_ids)
+```
+```{r}
+month %>% 
+  mutate(month = parse_date(month$month))
+
+```
+
+
+```{r}
+
+
+
+train_weeks = weeks[1:25,]
+test_weeks = weeks[26:nrow(weeks),]
+train_sample_date = sample_date[1:100,]
+test_sample_date = sample_date[101:nrow(sample_date),]
+
+model_weeks <- auto.arima(train_weeks$tot_ids,seasonal = TRUE)
+
+model_sample_date <-auto.arima(train_sample_date$tot_ids,seasonal = TRUE)
+
+predict(model_weeks,)
+predict(model_sample_date)
+
+```
+
+```{r}
+weeks %>%
+  filter(str_detect(sample_site, '301-1\\b')) %>%
+  dplyr::select(tot_ids) %>% ts(frequency = 52) %>%
+  auto.arima(lambda = 'auto') %>% 
+  forecast(h = 10, robust = TRUE) %>% summary() %>% 
+  autoplot(
+  xlab = 'Weeks',
+  ylab = 'CFU')
+
+```
+

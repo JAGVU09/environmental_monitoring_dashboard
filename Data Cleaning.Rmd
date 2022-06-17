@@ -1,0 +1,166 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyr)
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+library(lubridate)
+library(stringr)
+```
+
+
+```{r}
+micro<-read_excel('./data/eMIC Notebook - Berg.xlsx', col_types = c('Site_location' = 'text')) %>% 
+  fill(`MID Number`, .direction = "down") %>% 
+  fill(`Colony Morphology`, .direction = "down") %>% 
+  fill(`Performance Date`, .direction = "down") %>% 
+  pivot_longer(cols = starts_with('Site Location'), values_drop_na = TRUE) %>% 
+  dplyr::select(`Performance Date`, `MID Number`, `Colony Morphology`, value) %>% 
+  rename(date = `Performance Date`, ID = `MID Number`, sample_site = value) %>% 
+  mutate(date = parse_date_time(`date`,orders = 'd%B%Y%')) %>% 
+  mutate(Q = quarter(`date`, with_year = TRUE))
+```
+Possible variation on a sample site name (Human Data Entry Error)
+311-5: Air 5
+311:5: Air 5
+311-5:Air 5
+311-5 
+311-5 Air 5
+311-5:Air5
+311: 5Air 5
+311-5 :Air 5
+311-5Air 5
+311-5: air 5
+311-5Air5
+Construct a Regex that matches all of these and a match that converts to 311-5
+
+
+```{r}
+micro$sample_site<-micro$sample_site %>% 
+  str_trunc(.,6, ellipsis = '',side = c('right')) %>% 
+  str_replace('Air', '') %>% 
+  str_replace('-\\s+', '-') %>% 
+  str_squish %>% 
+  str_replace('-$', '') %>% 
+  str_replace('^[A-Za-z]+[\\s?|\\S?].[A-Za-z]*\\W\\d?\\W?|^0\\d+\\S\\w|\\d+mL|\\d% Cre', '') %>% 
+  str_replace('^[A-Za-z]+', '') %>%
+  str_replace('P|Run|[$]|10 mL|Dil|-Bac|-Fin|-che|-Che|\\d-Mi|-Sle|1-Lab|<62> T|-bac', '') %>% 
+  str_replace('^[-]', '') %>% 
+  str_replace(' ', '') %>% 
+  str_replace('108-\\d*\\w*|110-\\d*\\w*', "") %>% 
+  str_to_upper()
+
+micro$sample_site[micro$sample_site==""]<-NA
+
+micro<- micro %>% drop_na()
+```
+
+```{r}
+micro %>% write_csv('./data/micro.csv')
+```
+
+```{r}
+micro2<-read_csv('./data/micro.csv')
+```
+
+
+```{r}
+sample_site<-micro$sample_site %>%
+  unique() %>% 
+  tibble()
+
+sample_site %>% write_excel_csv('./data/sample_sites.csv')
+```
+
+```{r}
+micro2$sample_site %>% unique()
+```
+
+
+MFG-Ca
+NB-Fin
+CDB-Pa
+MFG-Ra
+TSA Se
+swab s
+C2-Mic
+50mL
+10mL
+MWP-Ba
+CDB-(2
+CDB-
+TSA SI
+DAS(F)
+BW(F)-
+0162-F
+3% Cre
+DS-Che
+Rack 2
+PB Dil
+EC Run
+Movab
+PA Run
+
+```{r}
+#Count ID grouped by site and add in Time component with date column.
+micro %>% 
+  group_by(sample_site) %>% 
+  summarise(tot_ids = n()) %>% 
+  ungroup() %>% 
+  arrange(desc(tot_ids))
+```
+
+```{r}
+quarters<-micro %>% 
+  group_by(sample_site, Q) %>% 
+  summarise(tot_ids = n()) %>% 
+  ungroup() %>% 
+  arrange(desc(tot_ids))
+```
+
+```{r}
+ggplot(quarters, aes(x = Q, y = tot_ids, color = sample_site, )) +
+  geom_col(show.legend = FALSE)
+```
+```{r}
+dates<-micro %>% 
+  group_by(sample_site, date) %>% 
+  summarise(tot_ids = n()) %>% 
+  ungroup() %>% 
+  arrange(desc(tot_ids))
+```
+
+
+```{r}
+df <- quarters %>% filter(str_detect(sample_site, "^302"))
+```
+
+```{r}
+t<-ggplot(df, aes(x = Q, y = tot_ids, color = sample_site)) +
+  geom_col()
+```
+
+```{r}
+t + facet_wrap(vars(sample_site))
+```
+
+
+```{r}
+df <- dates %>% filter(str_detect(sample_site, "302-1"))
+```
+
+```{r}
+t<-ggplot(df, aes(x = date, y = tot_ids, color = sample_site)) +
+  geom_col()
+```
+
+```{r}
+graph<-t + facet_wrap(vars(sample_site))
+```
+Show me sites that are increasing in counts for a particular year. to select for remediation
+
